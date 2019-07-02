@@ -29,7 +29,6 @@ dp.middleware.setup(mLoggingMiddleware())
 dp.middleware.setup(mUpdateUserMiddleware())
 
 
-
 @dp.message_handler(state='*', commands=['cancel'])
 @dp.message_handler(lambda msg: msg.text.lower() == 'cancel', state='*')
 async def cancel_handler(msg: types.Message, state: FSMContext, raw_state: Optional[str] = None):
@@ -68,7 +67,7 @@ async def enter_feedback_handler(msg: types.Message, state: FSMContext):
 
 
 @mDecorators.admin
-@dp.message_handler(lambda msg: msg.reply_to_message is not None and msg.from_user.id in config.admin_ids)
+@dp.message_handler(lambda msg: msg.reply_to_message is not None)
 async def feedback_response_handler(msg: types.Message):
     txt = msg.reply_to_message.text
     user_info = txt[txt.find('['): txt.find(']')][1:]
@@ -82,7 +81,7 @@ async def feedback_response_handler(msg: types.Message):
 
 
 @mDecorators.admin
-@dp.message_handler(commands=['send_to_everyone'], func=lambda msg: msg.from_user.id in config.admin_ids)
+@dp.message_handler(commands=['send_to_everyone'])
 async def send_to_everyone_command_handler(msg: types.Message):
     await bot.send_message(msg.chat.id, 'Отправьте сообщение')
     await SendToEveryoneDialog.first()

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import sys
 
 import uvloop
 from aiogram import Bot, Dispatcher, executor, types
@@ -8,6 +9,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import TelegramAPIError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from typing import Optional
+from loguru import logger
 
 from core import mDecorators, config, db_models
 from core.mMiddlewares import mLoggingMiddleware, mUpdateUserMiddleware
@@ -15,7 +17,19 @@ from core.states import FeedbackDialog, SendToEveryoneDialog
 from core import texts
 
 logging.basicConfig(format="[%(asctime)s] %(levelname)s : %(name)s : %(message)s",
-                    level=logging.DEBUG, datefmt="%d-%m-%y %H:%M:%S")
+                    level=logging.INFO, datefmt="%d-%m-%y %H:%M:%S")
+
+logger.remove()
+logger.add("./data/debug_logs.log", format="[{time:D:DD:DDDD:HH:mm:ss}] {level}: {name} : {message}",
+           level=logging.DEBUG,
+           colorize=False)
+logger.add("./data/info_logs.log", format="[{time:D:DD:DDDD:HH:mm:ss}] {level}: {name} : {message}", level=logging.INFO,
+           colorize=False)
+logger.add("./data/warn_logs.log", format="[{time:D:DD:DDDD:HH:mm:ss}] {level}: {name} : {message}",
+           level=logging.WARNING,
+           colorize=False)
+logger.add(sys.stderr, format="[{time:D:DD:DDDD:HH:mm:ss}] {level}: {name} : {message}", level=logging.INFO,
+           colorize=False)
 
 logging.getLogger('aiogram').setLevel(logging.INFO)
 

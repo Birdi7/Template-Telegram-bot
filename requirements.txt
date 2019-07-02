@@ -11,7 +11,6 @@ dnspython3==1.15.0
 idna==2.8
 loguru==0.3.0
 marshmallow==2.19.5
-mongoengine==0.18.2
 motor==2.0.0
 multidict==4.5.2
 pymongo==3.8.0

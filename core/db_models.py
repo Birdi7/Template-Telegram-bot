@@ -1,9 +1,7 @@
-from umongo import Document, Instance
+from umongo import Document, MotorAsyncIOInstance
 from umongo.fields import IntField, StringField
-from motor import motor_asyncio
 
-client = motor_asyncio.AsyncIOMotorClient()
-instance = Instance(client.test_db)
+instance = MotorAsyncIOInstance()
 
 
 @instance.register

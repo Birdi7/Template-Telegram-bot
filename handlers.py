@@ -12,7 +12,7 @@ from typing import Optional
 from loguru import logger
 
 from core import mDecorators, config, db_models
-from core.mMiddlewares import mLoggingMiddleware, mUpdateUserMiddleware
+from core.mMiddlewares import LoggingMiddleware, UpdateUserMiddleware
 from core.states import FeedbackDialog, SendToEveryoneDialog
 from core import texts
 
@@ -33,7 +33,7 @@ logger.add(sys.stderr, format="[{time:D:DD:DDDD:HH:mm:ss}] {level}: {name} : {me
 
 logging.getLogger('aiogram').setLevel(logging.INFO)
 
-uvloop.install()
+# uvloop.install()
 loop = asyncio.get_event_loop()
 bot = Bot(config.BOT_TOKEN, loop=loop)
 
@@ -42,8 +42,8 @@ scheduler = AsyncIOScheduler()
 scheduler.start()
 
 dp = Dispatcher(bot, storage=MemoryStorage())
-dp.middleware.setup(mLoggingMiddleware())
-dp.middleware.setup(mUpdateUserMiddleware())
+dp.middleware.setup(LoggingMiddleware())
+dp.middleware.setup(UpdateUserMiddleware())
 
 
 @dp.message_handler(state='*', commands=['cancel'])

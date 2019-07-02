@@ -2,18 +2,19 @@ import logging
 import time
 from aiogram import types
 from aiogram.dispatcher.middlewares import BaseMiddleware
-from src.db_worker import update_user_by_chat_id, update_user_by_message
+from core.db_worker import update_user
+
 HANDLED_STR = ['Unhandled', 'Handled']
 
 
-class mLoggingMiddleware(BaseMiddleware):
+class LoggingMiddleware(BaseMiddleware):
     def __init__(self, logger=None):
         if not isinstance(logger, logging.Logger):
             logger = logging.getLogger(self.__class__.__name__)
 
         self.logger = logger
 
-        super(mLoggingMiddleware, self).__init__()
+        super(LoggingMiddleware, self).__init__()
 
     def check_timeout(self, obj):
         start = obj.conf.get('_start', None)
@@ -33,7 +34,8 @@ class mLoggingMiddleware(BaseMiddleware):
         #     self.logger.info(f"Process update [ID:{update.update_id}]: [success] (in {timeout} ms)")
 
     async def on_pre_process_message(self, message: types.Message, data: dict):
-        self.logger.info(f"Received message [TEXT: \"{message.text}\"] in chat [{message.from_user.first_name} {message.from_user.username} {message.from_user.id}]")
+        self.logger.info(
+            f"Received message [TEXT: \"{message.text}\"] in chat [{message.from_user.first_name} {message.from_user.username} {message.from_user.id}]")
 
     async def on_post_process_message(self, message: types.Message, results, data: dict):
         pass
@@ -154,14 +156,21 @@ class mLoggingMiddleware(BaseMiddleware):
     async def on_pre_process_error(self, update: types.Update, error, data: dict):
         timeout = self.check_timeout(update)
         if timeout > 0:
-            self.logger.info(f"Process update [ID:{update.update_id}, NAME:{update.__class__.__name__}]: [failed] (in {timeout} ms)")
+            self.logger.info(
+                f"Process update [ID:{update.update_id}, NAME:{update.__class__.__name__}]: [failed] (in {timeout} ms)")
 
 
-class mUpdateUserMiddleware(BaseMiddleware):
+class UpdateUserMiddleware(BaseMiddleware):
+
     async def on_pre_process_message(self, message: types.Message, data: dict):
-        update_user_by_message(message)
+        await update_user(chat_id=message.from_user.id,
+                          first_name=message.from_user.first_name,
+                          last_name=message.from_user.last_name,
+                          username=message.from_user.username)
 
     async def on_pre_process_callback_query(self, callback_query: types.CallbackQuery, data: dict):
         if callback_query.message and callback_query.message.from_user:
-                update_user_by_chat_id(callback_query.from_user.id, callback_query.from_user.first_name, callback_query.from_user.last_name,
-                                       callback_query.from_user.username)
+            await update_user(chat_id=callback_query.from_user.id,
+                              first_name=callback_query.from_user.first_name,
+                              last_name=callback_query.from_user.last_name,
+                              username=callback_query.from_user.username)

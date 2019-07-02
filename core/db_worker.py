@@ -1,32 +1,24 @@
+import asyncio
+
 from core.db_models import instance, User
 from motor import motor_asyncio
 
 
-async def update_user_by_chat_id(chat_id, first_name, last_name, username):
+async def update_user(chat_id, **kwargs):
     """
         Обновление информации о пользователе
     """
-    raise NotImplementedError
-    # user = User.find(chat_id=chat_id)
-    # if
-    # try:
-    #     us = User.objects.get(chat_id=chat_id)
-    # except DoesNotExist:
-    #     us = User(chat_id=chat_id)
-    #
-    # us.first_name = first_name
-    # us.last_name = last_name
-    # us.username = username
-    #
-    # try:
-    #     us.save()
-    # except Exception:
-    #     pass
+    user = await User.find_one({"chat_id": chat_id})
+
+    if not user:
+        user = User(chat_id=chat_id, **kwargs)
+        await user.commit()
+    else:
+        user.update(**kwargs)
+        await user.commit()
 
 
-def update_user_by_message(msg):
-    update_user_by_chat_id(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username)
-
-
-client = motor_asyncio.AsyncIOMotorClient()
+client = motor_asyncio.AsyncIOMotorClient(host="mongodb+srv://birdi7:A0DdtfvGpLn3yha4@cluster0-aqa0h.gcp.mongodb.net/test?retryWrites=true&w=majority")
 instance.init(client.test_db)
+
+asyncio.get_event_loop().create_task(User.ensure_indexes())

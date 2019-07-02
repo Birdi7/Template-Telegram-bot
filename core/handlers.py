@@ -11,6 +11,7 @@ from typing import Optional
 from core import mDecorators, config, db_models
 from core.mMiddlewares import mLoggingMiddleware, mUpdateUserMiddleware
 from core.states import FeedbackDialog, SendToEveryoneDialog
+from core import texts
 
 logging.basicConfig(format="[%(asctime)s] %(levelname)s : %(name)s : %(message)s",
                     level=logging.DEBUG, datefmt="%d-%m-%y %H:%M:%S")

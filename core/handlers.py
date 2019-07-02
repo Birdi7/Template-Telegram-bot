@@ -1,6 +1,7 @@
 import asyncio
 import logging
 
+import uvloop
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
@@ -18,6 +19,7 @@ logging.basicConfig(format="[%(asctime)s] %(levelname)s : %(name)s : %(message)s
 
 logging.getLogger('aiogram').setLevel(logging.INFO)
 
+uvloop.install()
 loop = asyncio.get_event_loop()
 bot = Bot(config.BOT_TOKEN, loop=loop)
 

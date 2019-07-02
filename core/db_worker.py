@@ -1,3 +1,8 @@
+"""
+In every method, use MODEL.collection methods
+"""
+
+
 import asyncio
 
 from motor import motor_asyncio

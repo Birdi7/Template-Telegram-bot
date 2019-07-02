@@ -1,4 +1,4 @@
-import config
+from core import config
 
 
 def admin(func):

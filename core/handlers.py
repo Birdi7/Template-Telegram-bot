@@ -1,15 +1,16 @@
 import asyncio
 import logging
-from typing import Optional
+
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.utils.exceptions import TelegramAPIError
-from aiogram.types import InlineKeyboardMarkup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters.state import State, StatesGroup
-import utils
-from mMiddlewares import mLoggingMiddleware, mUpdateUserMiddleware
+from aiogram.utils.exceptions import TelegramAPIError
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from typing import Optional
 
+from core import mDecorators, config, db_models
+from core.mMiddlewares import mLoggingMiddleware, mUpdateUserMiddleware
+from core.states import FeedbackDialog, SendToEveryoneDialog
 
 logging.basicConfig(format="[%(asctime)s] %(levelname)s : %(name)s : %(message)s",
                     level=logging.DEBUG, datefmt="%d-%m-%y %H:%M:%S")
@@ -99,7 +100,7 @@ async def send_to_everyone(txt):
             await bot.send_message(u.chat_id, txt)
         except TelegramAPIError:
             pass
-        time.sleep(.5)
+        await asyncio.sleep(.5)
 
 
 async def shutdown(dispatcher: Dispatcher):

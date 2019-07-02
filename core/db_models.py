@@ -1,4 +1,5 @@
-from mongoengine import *
+from mongoengine import Document
+from mongoengine.fields import IntField, StringField
 
 
 class User(Document):

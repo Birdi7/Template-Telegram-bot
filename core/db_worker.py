@@ -1,5 +1,5 @@
-from src.db_models import User
-from mongoengine import *
+from core.db_models import User
+from mongoengine import connect, DoesNotExist
 
 
 def update_user_by_chat_id(chat_id, first_name, last_name, username):

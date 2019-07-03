@@ -2,7 +2,6 @@ import asyncio
 import logging
 import sys
 
-import uvloop
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
@@ -17,23 +16,23 @@ from core.states import FeedbackDialog, SendToEveryoneDialog
 from core import texts
 
 logging.basicConfig(format="[%(asctime)s] %(levelname)s : %(name)s : %(message)s",
-                    level=logging.INFO, datefmt="%d-%m-%y %H:%M:%S")
+                    level=logging.INFO, datefmt="%Y-%m-%d at %H:%M:%S")
 
 logger.remove()
-logger.add("./data/debug_logs.log", format="[{time:D:DD:DDDD:HH:mm:ss}] {level}: {name} : {message}",
+logger.add("./data/debug_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
            level=logging.DEBUG,
            colorize=False)
-logger.add("./data/info_logs.log", format="[{time:D:DD:DDDD:HH:mm:ss}] {level}: {name} : {message}", level=logging.INFO,
+logger.add("./data/info_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
+           level=logging.INFO,
            colorize=False)
-logger.add("./data/warn_logs.log", format="[{time:D:DD:DDDD:HH:mm:ss}] {level}: {name} : {message}",
+logger.add("./data/warn_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
            level=logging.WARNING,
            colorize=False)
-logger.add(sys.stderr, format="[{time:D:DD:DDDD:HH:mm:ss}] {level}: {name} : {message}", level=logging.INFO,
+logger.add(sys.stderr, format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}", level=logging.INFO,
            colorize=False)
 
 logging.getLogger('aiogram').setLevel(logging.INFO)
 
-# uvloop.install()
 loop = asyncio.get_event_loop()
 bot = Bot(config.BOT_TOKEN, loop=loop)
 

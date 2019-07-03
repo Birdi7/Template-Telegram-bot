@@ -7,6 +7,6 @@ instance = MotorAsyncIOInstance()
 @instance.register
 class User(Document):
     chat_id = IntField(unique=True)
-    first_name = StringField()
-    username = StringField()
-    last_name = StringField()
+    first_name = StringField(allow_none=True)
+    username = StringField(allow_none=True)
+    last_name = StringField(allow_none=True)

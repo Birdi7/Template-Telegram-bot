@@ -10,22 +10,25 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from typing import Optional
 from loguru import logger
 
-from core import mDecorators, config, db_models
-from core.mMiddlewares import LoggingMiddleware, UpdateUserMiddleware
-from core.states import FeedbackDialog, SendToEveryoneDialog
-from core import texts
+from utils import mDecorators, texts
+from database.models import user_model
+from utils.mMiddlewares import LoggingMiddleware, UpdateUserMiddleware
+from utils.states import FeedbackDialog, SendToEveryoneDialog
+from configs import telegram
 
 logging.basicConfig(format="[%(asctime)s] %(levelname)s : %(name)s : %(message)s",
                     level=logging.INFO, datefmt="%Y-%m-%d at %H:%M:%S")
 
 logger.remove()
-logger.add("./data/debug_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
+logger.add("./logs/debug_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
            level=logging.DEBUG,
            colorize=False)
-logger.add("./data/info_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
+
+logger.add("./logs/info_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
            level=logging.INFO,
            colorize=False)
-logger.add("./data/warn_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
+
+logger.add("./logs/warn_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
            level=logging.WARNING,
            colorize=False)
 logger.add(sys.stderr, format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}", level=logging.INFO,
@@ -34,7 +37,7 @@ logger.add(sys.stderr, format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} :
 logging.getLogger('aiogram').setLevel(logging.INFO)
 
 loop = asyncio.get_event_loop()
-bot = Bot(config.BOT_TOKEN, loop=loop)
+bot = Bot(telegram.BOT_TOKEN, loop=loop)
 
 scheduler = AsyncIOScheduler()
 # todo add persistent storage if you plan to save smth important in the scheduler
@@ -75,7 +78,7 @@ async def enter_feedback_handler(msg: types.Message, state: FSMContext):
     await msg.reply(texts.got)
     await state.finish()
 
-    for admin in config.admin_ids:
+    for admin in telegram.admin_ids:
         try:
             await bot.send_message(admin, f"[@{msg.from_user.username} ID: {msg.from_user.id} MESSAGE_ID: {msg.message_id}] пишет:\n{msg.text}")
         except:
@@ -110,7 +113,7 @@ async def enter_send_to_everyone_handler(msg: types.Message):
 
 
 async def send_to_everyone(txt):
-    for u in db_models.User.objects():
+    for u in user_model.User.objects():
         try:
             await bot.send_message(u.chat_id, txt)
         except TelegramAPIError:

@@ -10,9 +10,9 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from typing import Optional
 from loguru import logger
 
-from utils import mDecorators, texts
+from utils import decorators, texts
 from database.models import user_model
-from utils.mMiddlewares import LoggingMiddleware, UpdateUserMiddleware
+from utils.middlewares import LoggingMiddleware, UpdateUserMiddleware
 from utils.states import FeedbackDialog, SendToEveryoneDialog
 from configs import telegram
 
@@ -85,7 +85,7 @@ async def enter_feedback_handler(msg: types.Message, state: FSMContext):
             pass
 
 
-@mDecorators.admin
+@decorators.admin
 @dp.message_handler(lambda msg: msg.reply_to_message is not None)
 async def feedback_response_handler(msg: types.Message):
     txt = msg.reply_to_message.text
@@ -99,7 +99,7 @@ async def feedback_response_handler(msg: types.Message):
         pass
 
 
-@mDecorators.admin
+@decorators.admin
 @dp.message_handler(commands=['send_to_everyone'])
 async def send_to_everyone_command_handler(msg: types.Message):
     await bot.send_message(msg.chat.id, 'Отправьте сообщение')

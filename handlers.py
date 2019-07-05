@@ -15,6 +15,7 @@ from database.models import user_model
 from utils.middlewares import LoggingMiddleware, UpdateUserMiddleware
 from utils.states import FeedbackDialog, SendToEveryoneDialog
 from configs import telegram
+from database import db_worker as db
 
 logging.basicConfig(format="[%(asctime)s] %(levelname)s : %(name)s : %(message)s",
                     level=logging.INFO, datefmt="%Y-%m-%d at %H:%M:%S")
@@ -37,7 +38,7 @@ logger.add(sys.stderr, format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} :
 logging.getLogger('aiogram').setLevel(logging.INFO)
 
 loop = asyncio.get_event_loop()
-bot = Bot(telegram.BOT_TOKEN, loop=loop)
+bot = Bot(telegram.BOT_TOKEN, loop=loop, parse_mode=types.ParseMode.HTML)
 
 scheduler = AsyncIOScheduler()
 # todo add persistent storage if you plan to save smth important in the scheduler
@@ -57,14 +58,26 @@ async def cancel_handler(msg: types.Message, state: FSMContext, raw_state: Optio
     await bot.send_message(msg.from_user.id, 'Cancelled')
 
 
+@mDecorators.admin
+@dp.message_handler(state='*', commands=['drop'])
+async def drop_command_handler(msg: types.Message):
+    await db.drop_db()
+    await bot.send_message(msg.from_user.id, '<b>DB dropped</b>\n /start')
+
+
 @dp.message_handler(commands=['start'], state='*')
 async def start_command_handler(msg: types.Message):
+    await db.update_user(chat_id=msg.from_user.id,
+                         username=msg.from_user.username,
+                         first_name=msg.from_user.first_name,
+                         last_name=msg.from_user.last_name)
     await bot.send_message(msg.chat.id, f"Hi from start!")
 
 
 @dp.message_handler(commands=['help'], state='*')
 async def help_command_handler(msg: types.Message):
-    await bot.send_message(msg.chat.id, f"hi from help")
+    user = await db.get_user(chat_id=msg.from_user.id)
+    await bot.send_message(msg.chat.id, f"hi from help, {user.first_name}")
 
 
 @dp.message_handler(commands=['feedback'], state='*')
@@ -78,9 +91,10 @@ async def enter_feedback_handler(msg: types.Message, state: FSMContext):
     await msg.reply(texts.got)
     await state.finish()
 
-    for admin in telegram.admin_ids:
+    for admin in telegram.ADMIN_IDS:
         try:
-            await bot.send_message(admin, f"[@{msg.from_user.username} ID: {msg.from_user.id} MESSAGE_ID: {msg.message_id}] пишет:\n{msg.text}")
+            await bot.send_message(admin,
+                                   f"[@{msg.from_user.username} ID: {msg.from_user.id} MESSAGE_ID: {msg.message_id}] пишет:\n{msg.text}")
         except:
             pass
 
@@ -90,8 +104,8 @@ async def enter_feedback_handler(msg: types.Message, state: FSMContext):
 async def feedback_response_handler(msg: types.Message):
     txt = msg.reply_to_message.text
     user_info = txt[txt.find('['): txt.find(']')][1:]
-    chat_id = int(user_info[user_info.find('ID:')+len('ID:')+1:user_info.find('MESSAGE_ID')])
-    msg_id = int(user_info[user_info.find('MESSAGE_ID:')+len('MESSAGE_ID:')+1:])
+    chat_id = int(user_info[user_info.find('ID:') + len('ID:') + 1:user_info.find('MESSAGE_ID')])
+    msg_id = int(user_info[user_info.find('MESSAGE_ID:') + len('MESSAGE_ID:') + 1:])
 
     try:
         await bot.send_message(chat_id, f'Разработчик ответил следующее:\n{msg.text}', reply_to_message_id=msg_id)

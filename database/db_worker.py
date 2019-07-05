@@ -1,8 +1,3 @@
-"""
-In every method, use MODEL.collection methods
-"""
-
-
 import asyncio
 
 from motor import motor_asyncio
@@ -15,7 +10,29 @@ async def update_user(chat_id, **kwargs):
     """
         Обновление информации о пользователе
     """
-    await User.collection.update_one({"chat_id": chat_id}, {"$set": kwargs}, upsert=True)
+    user = await User.find_one({"chat_id": chat_id})
+
+    if user is None:
+        new_user = User(chat_id=chat_id, **kwargs)
+        await new_user.commit()
+    else:
+        setattr(user, 'chat_id', chat_id)
+        for k, v in kwargs.items():
+            setattr(user, k, v)
+
+
+async def get_user(chat_id):
+    """
+        Получуние информации о пользователе
+    """
+    return await User.find_one({"chat_id": chat_id})
+
+
+async def drop_db():
+    """
+        Дроп базы данных
+    """
+    await User.collection.drop()
 
 
 client = motor_asyncio.AsyncIOMotorClient(host=database.HOST_URL)

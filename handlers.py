@@ -58,7 +58,7 @@ async def cancel_handler(msg: types.Message, state: FSMContext, raw_state: Optio
     await bot.send_message(msg.from_user.id, 'Cancelled')
 
 
-@mDecorators.admin
+@decorators.admin
 @dp.message_handler(state='*', commands=['drop'])
 async def drop_command_handler(msg: types.Message):
     await db.drop_db()
@@ -94,7 +94,8 @@ async def enter_feedback_handler(msg: types.Message, state: FSMContext):
     for admin in telegram.ADMIN_IDS:
         try:
             await bot.send_message(admin,
-                                   f"[@{msg.from_user.username} ID: {msg.from_user.id} MESSAGE_ID: {msg.message_id}] пишет:\n{msg.text}")
+                                   f"[@{msg.from_user.username} ID: {msg.from_user.id} "
+                                   f"MESSAGE_ID: {msg.message_id}] пишет:\n{msg.text}")
         except:
             pass
 

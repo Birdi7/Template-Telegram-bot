@@ -58,7 +58,7 @@ async def cancel_handler(msg: types.Message, state: FSMContext, raw_state: Optio
     await bot.send_message(msg.from_user.id, 'Cancelled')
 
 
-@mDecorators.admin
+@decorators.admin
 @dp.message_handler(state='*', commands=['drop'])
 async def drop_command_handler(msg: types.Message):
     await db.drop_db()

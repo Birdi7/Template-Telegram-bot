@@ -37,7 +37,7 @@ logger.add(sys.stderr, format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} :
 
 logging.getLogger('aiogram').setLevel(logging.INFO)
 
-loop = asyncio.get_event_loop()
+loop = asyncio.get_event_loop() # todo replace with uvloop
 bot = Bot(telegram.BOT_TOKEN, loop=loop, parse_mode=types.ParseMode.HTML)
 
 scheduler = AsyncIOScheduler()
@@ -136,6 +136,7 @@ async def send_to_everyone(txt):
 
 
 async def shutdown(dispatcher: Dispatcher):
+    logger.warning(f"Don't close the dp storage by yourself if you're using a storage based on files!")
     await dispatcher.storage.close()
     await dispatcher.storage.wait_closed()
 

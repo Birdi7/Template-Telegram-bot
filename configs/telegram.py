@@ -1,4 +1,5 @@
 # Here is your telegram config data such as bot token, admin id's etc.
+import os
 
-BOT_TOKEN = '199586207:AAH19rOYeEwE8JFDN4Y9NHQ3l1_WOh16YJs'
+BOT_TOKEN = os.getenv('BOT_TOKEN')
 ADMIN_IDS = []

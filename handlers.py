@@ -135,11 +135,5 @@ async def send_to_everyone(txt):
         await asyncio.sleep(.5)
 
 
-async def shutdown(dispatcher: Dispatcher):
-    logger.warning(f"Don't close the dp storage by yourself if you're using a storage based on files!")
-    await dispatcher.storage.close()
-    await dispatcher.storage.wait_closed()
-
-
 if __name__ == '__main__':
-    executor.start_polling(dp, on_shutdown=shutdown)
+    executor.start_polling(dp)

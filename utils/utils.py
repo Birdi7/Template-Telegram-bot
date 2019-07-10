@@ -5,10 +5,11 @@ def create_button(text):
     return KeyboardButton(text=text)
 
 
-def create_keyboard(*buttons, row_width=3, one_time_keyboard=True):
-    nk = ReplyKeyboardMarkup(one_time_keyboard=True,
+def create_keyboard(*buttons, row_width=3,
+                    one_time_keyboard=True, resize_keyboard=True):
+    nk = ReplyKeyboardMarkup(one_time_keyboard=one_time_keyboard,
                              row_width=row_width,
-                             resize_keyboard=True)
+                             resize_keyboard=resize_keyboard)
     nk.add(*buttons)
     return nk
 

@@ -6,6 +6,7 @@ This project can be run purely with python,
 but also supports the deployment using [docker-compose](docker_compose)
  
 Purely python running:
+
 0. Check if you have the right version of python. Python3 -V should output 3.7+
 1. Create a virtual environment with `python3 -m virtualenv venv`. 
 2. Run `source venv/bin/activate` to activate the venv

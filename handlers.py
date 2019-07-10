@@ -10,9 +10,8 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from typing import Optional
 from loguru import logger
 
-from utils import decorators, texts
+from utils import decorators, texts, middlewares
 from database.models import user_model
-from utils.middlewares import LoggingMiddleware, UpdateUserMiddleware
 from utils.states import FeedbackDialog, SendToEveryoneDialog
 from configs import telegram
 from database import db_worker as db
@@ -45,8 +44,6 @@ scheduler = AsyncIOScheduler()
 scheduler.start()
 
 dp = Dispatcher(bot, storage=MemoryStorage())
-dp.middleware.setup(LoggingMiddleware())
-dp.middleware.setup(UpdateUserMiddleware())
 
 
 @dp.message_handler(state='*', commands=['cancel'])
@@ -136,4 +133,5 @@ async def send_to_everyone(txt):
 
 
 if __name__ == '__main__':
+    middlewares.on_startup(dp)
     executor.start_polling(dp)

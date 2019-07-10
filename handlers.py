@@ -12,7 +12,7 @@ from loguru import logger
 
 from utils import decorators, texts, middlewares
 from database.models import user_model
-from utils.states import FeedbackDialog, SendToEveryoneDialog
+from utils.states import feedback, MailingEveryoneDialog
 from configs import telegram
 from database import db_worker as db
 
@@ -80,10 +80,10 @@ async def help_command_handler(msg: types.Message):
 @dp.message_handler(commands=['feedback'], state='*')
 async def feedback_command_handler(msg: types.Message):
     await bot.send_message(msg.chat.id, texts.feedback_command)
-    await FeedbackDialog.first()
+    await feedback.first()
 
 
-@dp.message_handler(state=FeedbackDialog.enter_feedback)
+@dp.message_handler(state=feedback.enter_feedback)
 async def enter_feedback_handler(msg: types.Message, state: FSMContext):
     await msg.reply(texts.got)
     await state.finish()
@@ -114,10 +114,10 @@ async def feedback_response_handler(msg: types.Message):
 @dp.message_handler(commands=['send_to_everyone'])
 async def send_to_everyone_command_handler(msg: types.Message):
     await bot.send_message(msg.chat.id, 'Отправьте сообщение')
-    await SendToEveryoneDialog.first()
+    await MailingEveryoneDialog.first()
 
 
-@dp.message_handler(state=SendToEveryoneDialog.enter_message)
+@dp.message_handler(state=MailingEveryoneDialog.enter_message)
 async def enter_send_to_everyone_handler(msg: types.Message):
     await bot.send_message(msg.chat.id, 'Получено')
     scheduler.add_job(send_to_everyone, args=[msg.text])

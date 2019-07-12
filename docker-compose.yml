@@ -21,3 +21,8 @@ services:
       WEBHOOK_SSL_CERT_PATH: ${WEBHOOK_SSL_CERT_PATH}
       WEBHOOK_SSL_PRIV_PATH: ${WEBHOOK_SSL_PRIV_PATH}
 
+
+    volumes:
+      - .:/app
+
+    network_mode: host

@@ -10,25 +10,35 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from typing import Optional
 from loguru import logger
 
-from utils import decorators, texts, middlewares
-from database.models import user_model
-from utils.states import FeedbackDialog, MailingEveryoneDialog
-from configs import telegram
-from database import db_worker as db
+from core.utils import decorators
+from core.utils.middlewares import (
+    update_middleware,
+    logger_middleware
+)
+
+from core.database.models import user_model
+from core.utils.states.feedback import FeedbackDialog
+from core.utils.states.mailing_everyone import MailingEveryoneDialog
+from core.configs import telegram
+from core.database import db_worker as db
+from core import strings
+from core.configs.consts import LOGS_FOLDER
+from core.reply_markups.inline import available_languages as available_languages_markup
+from core.reply_markups.callbacks.language_choice import language_callback
 
 logging.basicConfig(format="[%(asctime)s] %(levelname)s : %(name)s : %(message)s",
                     level=logging.INFO, datefmt="%Y-%m-%d at %H:%M:%S")
 
 logger.remove()
-logger.add("./logs/debug_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
+logger.add(LOGS_FOLDER / "debug_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
            level=logging.DEBUG,
            colorize=False)
 
-logger.add("./logs/info_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
+logger.add(LOGS_FOLDER / "info_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
            level=logging.INFO,
            colorize=False)
 
-logger.add("./logs/warn_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
+logger.add(LOGS_FOLDER / "warn_logs.log", format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}",
            level=logging.WARNING,
            colorize=False)
 logger.add(sys.stderr, format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} : {message}", level=logging.INFO,
@@ -36,8 +46,9 @@ logger.add(sys.stderr, format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} :
 
 logging.getLogger('aiogram').setLevel(logging.INFO)
 
-loop = asyncio.get_event_loop() # todo replace with uvloop
-bot = Bot(telegram.BOT_TOKEN, loop=loop, parse_mode=types.ParseMode.HTML)
+loop = asyncio.get_event_loop()  # todo replace with uvloop. Replaced actually, because there is a uvloop in the reqs.txt
+bot = Bot(telegram.BOT_TOKEN, loop=loop, parse_mode=types.ParseMode.HTML,
+          proxy="socks5://localhost:8123")
 
 scheduler = AsyncIOScheduler()
 # todo add persistent storage if you plan to save smth important in the scheduler
@@ -52,7 +63,7 @@ async def cancel_handler(msg: types.Message, state: FSMContext, raw_state: Optio
     if raw_state is None:
         return None
     await state.finish()
-    await bot.send_message(msg.from_user.id, 'Cancelled')
+    await bot.send_message(msg.from_user.id, strings.cancel)
 
 
 @decorators.admin
@@ -68,32 +79,59 @@ async def start_command_handler(msg: types.Message):
                          username=msg.from_user.username,
                          first_name=msg.from_user.first_name,
                          last_name=msg.from_user.last_name)
-    await bot.send_message(msg.chat.id, f"Hi from start!")
+    await bot.send_message(msg.chat.id, strings.start_cmd)
 
 
 @dp.message_handler(commands=['help'], state='*')
 async def help_command_handler(msg: types.Message):
     user = await db.get_user(chat_id=msg.from_user.id)
-    await bot.send_message(msg.chat.id, f"hi from help, {user.first_name}")
+    await bot.send_message(msg.chat.id, strings.help_cmd.format(name=user.first_name))
 
 
 @dp.message_handler(commands=['feedback'], state='*')
 async def feedback_command_handler(msg: types.Message):
-    await bot.send_message(msg.chat.id, texts.feedback_command)
+    await bot.send_message(msg.chat.id, strings.feedback_command)
     await FeedbackDialog.first()
 
 
 @dp.message_handler(state=FeedbackDialog.enter_feedback)
 async def enter_feedback_handler(msg: types.Message, state: FSMContext):
-    await msg.reply(texts.got)
+    await msg.reply(strings.got)
     await state.finish()
 
     for admin in telegram.ADMIN_IDS:
         try:
             await bot.send_message(admin,
-                                   f"[@{msg.from_user.username} ID: {msg.from_user.id} MESSAGE_ID: {msg.message_id}] пишет:\n{msg.text}")
-        except:
+                                   f"[@{msg.from_user.username} ID: {msg.from_user.id} MESSAGE_ID: {msg.message_id}]"
+                                   f" пишет:\n{msg.text}")
+        except TelegramAPIError:
             pass
+
+
+@dp.message_handler(commands='language')
+async def language_cmd_handler(msg: types.Message):
+    logging.critical(f"Markup={available_languages_markup}")
+    await bot.send_message(msg.from_user.id,
+                           text=strings.language_choice,
+                           reply_markup=available_languages_markup)
+
+    logging.critical(f"Filter is {language_callback.filter()}")
+
+
+@dp.callback_query_handler(language_callback.filter())
+async def language_choice_handler(query: types.CallbackQuery, callback_data: dict):
+    # todo:
+    # bug in aiogram that it doesn't send data when the filter is empty?
+
+    if data is None:
+        logging.critical("data is none")
+    else:
+
+        await db.update_user(query.from_user.id,
+                             locale=callback_data['user_locale'])
+
+        await bot.send_message(query.from_user.id,
+                               strings.language_set)
 
 
 @decorators.admin
@@ -105,21 +143,22 @@ async def feedback_response_handler(msg: types.Message):
     msg_id = int(user_info[user_info.find('MESSAGE_ID:') + len('MESSAGE_ID:') + 1:])
 
     try:
-        await bot.send_message(chat_id, f'Разработчик ответил следующее:\n{msg.text}', reply_to_message_id=msg_id)
-    except Exception:
+        await bot.send_message(chat_id, strings.feedback_response.format(text=msg.text),
+                               reply_to_message_id=msg_id)
+    except TelegramAPIError:
         pass
 
 
 @decorators.admin
 @dp.message_handler(commands=['send_to_everyone'])
 async def send_to_everyone_command_handler(msg: types.Message):
-    await bot.send_message(msg.chat.id, 'Отправьте сообщение')
+    await bot.send_message(msg.chat.id, strings.mailing_everyone)
     await MailingEveryoneDialog.first()
 
 
 @dp.message_handler(state=MailingEveryoneDialog.enter_message)
-async def enter_send_to_everyone_handler(msg: types.Message):
-    await bot.send_message(msg.chat.id, 'Получено')
+async def mailing_everyone_handler(msg: types.Message):
+    await bot.send_message(msg.chat.id, strings.got)
     scheduler.add_job(send_to_everyone, args=[msg.text])
 
 
@@ -132,6 +171,14 @@ async def send_to_everyone(txt):
         await asyncio.sleep(.5)
 
 
-if __name__ == '__main__':
-    middlewares.on_startup(dp)
+def main():
+    logger.info("Compile .po and .mo before running!")
+
+    update_middleware.on_startup(dp)
+    logger_middleware.on_startup(dp)
+    strings.on_startup(dp)  # enable i18n
     executor.start_polling(dp)
+
+
+if __name__ == '__main__':
+    main()

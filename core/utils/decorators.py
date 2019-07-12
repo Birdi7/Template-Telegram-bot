@@ -1,4 +1,4 @@
-from configs import telegram
+from core.configs import telegram
 
 
 def admin(func):

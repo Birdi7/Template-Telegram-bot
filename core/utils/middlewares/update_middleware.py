@@ -1,7 +1,7 @@
-from aiogram import types
+from aiogram import types, Dispatcher
 from aiogram.dispatcher.middlewares import BaseMiddleware
 
-from database.db_worker import update_user
+from core.database.db_worker import update_user
 
 
 class UpdateUserMiddleware(BaseMiddleware):
@@ -18,3 +18,7 @@ class UpdateUserMiddleware(BaseMiddleware):
                               first_name=callback_query.from_user.first_name,
                               last_name=callback_query.from_user.last_name,
                               username=callback_query.from_user.username)
+
+
+def on_startup(dp: Dispatcher):
+    dp.middleware.setup(UpdateUserMiddleware())

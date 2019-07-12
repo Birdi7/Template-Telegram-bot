@@ -1,8 +1,9 @@
 import time
 import logging
 
+
 from aiogram.dispatcher.middlewares import BaseMiddleware
-from aiogram import types
+from aiogram import types, Dispatcher
 
 HANDLED_STR = ['Unhandled', 'Handled']
 
@@ -29,9 +30,8 @@ class LoggingMiddleware(BaseMiddleware):
 
     async def on_post_process_update(self, update: types.Update, result, data: dict):
         timeout = self.check_timeout(update)
-        pass
-        # if timeout > 0:
-        #     self.logger.info(f"Process update [ID:{update.update_id}]: [success] (in {timeout} ms)")
+        if timeout > 0:
+            self.logger.info(f"Process update [ID:{update.update_id}]: [success] (in {timeout} ms)")
 
     async def on_pre_process_message(self, message: types.Message, data: dict):
         self.logger.info(
@@ -102,14 +102,14 @@ class LoggingMiddleware(BaseMiddleware):
     async def on_pre_process_callback_query(self, callback_query: types.CallbackQuery, data: dict):
         if callback_query.message:
             if callback_query.message.from_user:
-                self.logger.info(f"Received callback query [ID:{callback_query.id}, DATA:{callback_query.logs}] "
+                self.logger.info(f"Received callback query [ID:{callback_query.id}, DATA:{callback_query.data}] "
                                  f"in chat [{callback_query.message.chat.type}:{callback_query.message.chat.id}] "
                                  f"from user [USERNAME:{callback_query.message.from_user.username}, ID:{callback_query.message.from_user.id}]")
             else:
-                self.logger.info(f"Received callback query [ID:{callback_query.id}], DATA:{callback_query.logs}] "
+                self.logger.info(f"Received callback query [ID:{callback_query.id}], DATA:{callback_query.data}] "
                                  f"in chat [{callback_query.message.chat.type}:{callback_query.message.chat.id}]")
         else:
-            self.logger.info(f"Received callback query [ID:{callback_query.id}, DATA:{callback_query.logs}] "
+            self.logger.info(f"Received callback query [ID:{callback_query.id}, DATA:{callback_query.data}] "
                              f"from inline message [ID:{callback_query.inline_message_id}] "
                              f"from user [ID:{callback_query.from_user.username}]")
 
@@ -158,3 +158,7 @@ class LoggingMiddleware(BaseMiddleware):
         if timeout > 0:
             self.logger.info(
                 f"Process update [ID:{update.update_id}, NAME:{update.__class__.__name__}]: [failed] (in {timeout} ms)")
+
+
+def on_startup(dp: Dispatcher):
+    dp.middleware.setup(LoggingMiddleware())

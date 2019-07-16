@@ -21,6 +21,7 @@ async def update_user(chat_id, **kwargs):
         setattr(user, 'chat_id', chat_id)
         for k, v in kwargs.items():
             setattr(user, k, v)
+        await user.commit()
 
 
 async def get_user(chat_id):

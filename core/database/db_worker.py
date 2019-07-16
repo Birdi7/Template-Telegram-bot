@@ -25,7 +25,7 @@ async def update_user(chat_id, **kwargs):
 
 async def get_user(chat_id):
     """
-        Получуние информации о пользователе
+        Получение информации о пользователе
     """
     return await User.find_one({"chat_id": chat_id})
 

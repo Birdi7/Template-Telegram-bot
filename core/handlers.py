@@ -110,28 +110,18 @@ async def enter_feedback_handler(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(commands='language')
 async def language_cmd_handler(msg: types.Message):
-    logging.critical(f"Markup={available_languages_markup}")
     await bot.send_message(msg.from_user.id,
                            text=strings.language_choice,
                            reply_markup=available_languages_markup)
 
-    logging.critical(f"Filter is {language_callback.filter()}")
-
 
 @dp.callback_query_handler(language_callback.filter())
 async def language_choice_handler(query: types.CallbackQuery, callback_data: dict):
-    # todo:
-    # bug in aiogram that it doesn't send data when the filter is empty?
-
-    if data is None:
-        logging.critical("data is none")
-    else:
-
-        await db.update_user(query.from_user.id,
-                             locale=callback_data['user_locale'])
-
-        await bot.send_message(query.from_user.id,
-                               strings.language_set)
+    await query.answer()
+    await db.update_user(query.from_user.id,
+                         locale=callback_data['user_locale'])
+    await bot.send_message(query.from_user.id,
+                           strings.language_set)
 
 
 @decorators.admin

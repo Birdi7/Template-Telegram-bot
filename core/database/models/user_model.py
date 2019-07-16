@@ -1,6 +1,5 @@
 from umongo import Document, MotorAsyncIOInstance
 from umongo.fields import IntField, StringField
-from core.configs.locales import DEFAULT_USER_LOCALE
 
 instance = MotorAsyncIOInstance()
 
@@ -11,4 +10,4 @@ class User(Document):
     first_name = StringField(allow_none=True)
     username = StringField(allow_none=True)
     last_name = StringField(allow_none=True)
-    locale = StringField(default=DEFAULT_USER_LOCALE)
+    locale = StringField(allow_none=True)

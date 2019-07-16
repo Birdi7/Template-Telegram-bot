@@ -7,7 +7,7 @@ help_cmd = _("help_command_text, formats: {name}")
 feedback_command = _('feedback_command')
 feedback_response = _('Developer answered:\n{text}')
 
-language_choice = _('Choose your language')
+language_choice = _('choose lang')
 language_set = _('Language set!')
 
 got = _('got')

@@ -46,7 +46,7 @@ logger.add(sys.stderr, format="[{time:YYYY-MM-DD at HH:mm:ss}] {level}: {name} :
 
 logging.getLogger('aiogram').setLevel(logging.INFO)
 
-loop = asyncio.get_event_loop()  # todo replace with uvloop. Replaced actually, because there is a uvloop in the reqs.txt
+loop = asyncio.get_event_loop()
 bot = Bot(telegram.BOT_TOKEN, loop=loop, parse_mode=types.ParseMode.HTML,
           proxy="socks5://localhost:8123")
 

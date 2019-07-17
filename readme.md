@@ -7,7 +7,8 @@ but also supports the deployment using [docker-compose](docker_compose)
  
 Purely python running:
 
-0. Check if you have the right version of python. Python3 -V should output 3.7+
+0. Check if you have the right version of python. Python3 -V should output 3.7+.
+
    If you are on Windows, remove uvloop from [requirements.txt](requirements.txt)
    as this lib doesn't work on this OS.
 1. Create a virtual environment with `python3 -m virtualenv venv`. 

@@ -17,7 +17,7 @@ Purely python running:
 4. Run bot with `python handlers.py` 
 
 With docker-compose:
-1. Copy an example environment file with `cp example.env .env`
+1. Copy an example environment file with `cp example.env local.env`
 2. Modify the local environment file named `.env`   
 1. Run `docker-compose up -d --build`
 

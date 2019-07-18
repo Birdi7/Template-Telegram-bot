@@ -1,0 +1,63 @@
+# English translations for PROJECT.
+# Copyright (C) 2019 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-07-17 20:37+0300\n"
+"PO-Revision-Date: 2019-07-16 13:08+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.7.0\n"
+
+#: core/strings/keys.py:5
+msgid "start_cmd_text"
+msgstr "Hello from start"
+
+#: core/strings/keys.py:6
+msgid "help_command_text, formats: {name}"
+msgstr "Hello from help, {name}"
+
+#: core/strings/keys.py:7
+msgid "drop_cmd_text"
+msgstr "DB dropped! /start"
+
+#: core/strings/keys.py:8
+msgid "feedback_command"
+msgstr "Send feedback"
+
+#: core/strings/keys.py:9
+msgid ""
+"Developer answered:\n"
+"{text}"
+msgstr ""
+"Developer answered:\n"
+"{text}"
+
+#: core/strings/keys.py:11
+msgid "choose lang"
+msgstr "Choose your language"
+
+#: core/strings/keys.py:12
+msgid "Language set!"
+msgstr "Language set!"
+
+#: core/strings/keys.py:14
+msgid "got"
+msgstr "Got."
+
+#: core/strings/keys.py:17
+msgid "cancelled"
+msgstr "Cancelled."
+
+#: core/strings/keys.py:18
+msgid "mailing_everyone"
+msgstr "Your next message will be sent to everyone"

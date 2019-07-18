@@ -4,6 +4,27 @@ from .scripts import i18n
 
 
 def _(string, cache_enable=False):
+    """
+    why the cache enable parameters is needed:
+    after starting the script, every var here will be
+    a LazyProxy object. When .value will be invoked, without cache_enable=True
+    it will be cache for the object after the first calling. As a result,
+    the text for the locale with which the first calling was called will be for this object
+
+    Example:
+
+    i18n.set_ctx_locale('ru')
+    bot.send_msg(..., start_cmd) # here the string will be russian
+    i18n.set_ctx_locale('en')
+    bot.send_msg(..., start_cmd) # here the string will still be russian because of cache value
+
+    :param string:
+    :param cache_enable:
+    :return:
+    """
+    # why the cache enable parameters is needed:
+    # after starting the script, every var here will be
+    #
     return i18n.lazy_gettext(string, cache_enable=cache_enable)
 
 

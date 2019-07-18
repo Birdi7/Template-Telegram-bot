@@ -118,6 +118,10 @@ async def language_choice_handler(query: types.CallbackQuery, callback_data: dic
     await query.answer()
     await db.update_user(query.from_user.id,
                          locale=callback_data['user_locale'])
+
+    from core.strings import i18n
+    i18n.ctx_locale.set(callback_data['user_locale'])
+
     await bot.send_message(query.from_user.id,
                            strings.language_set)
 

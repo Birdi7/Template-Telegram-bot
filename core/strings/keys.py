@@ -1,6 +1,11 @@
-from .scripts import _
+from .scripts import i18n
 
 # no f-strings here!
+
+
+def _(string, cache_enable=False):
+    return i18n.lazy_gettext(string, cache_enable=cache_enable)
+
 
 start_cmd = _("start_cmd_text")
 help_cmd = _("help_command_text, formats: {name}")

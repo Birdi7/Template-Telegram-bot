@@ -1,32 +1,29 @@
 import asyncio
 import logging
 import sys
+from typing import Optional
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import TelegramAPIError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from typing import Optional
 from loguru import logger
 
+from core import strings
+from core.configs import telegram
+from core.configs.consts import LOGS_FOLDER
+from core.database import db_worker as db
+from core.database.models import user_model
+from core.reply_markups.callbacks.language_choice import language_callback
+from core.reply_markups.inline import available_languages as available_languages_markup
 from core.utils import decorators
 from core.utils.middlewares import (
     update_middleware,
     logger_middleware
 )
-
-from core.database.models import user_model
 from core.utils.states.feedback import FeedbackDialog
 from core.utils.states.mailing_everyone import MailingEveryoneDialog
-from core.configs import telegram
-from core.database import db_worker as db
-from core import strings
-from core.configs.consts import LOGS_FOLDER
-from core.reply_markups.inline import available_languages as available_languages_markup
-from core.reply_markups.callbacks.language_choice import language_callback
-from core.strings.scripts import _
-
 
 logging.basicConfig(format="[%(asctime)s] %(levelname)s : %(name)s : %(message)s",
                     level=logging.INFO, datefmt="%Y-%m-%d at %H:%M:%S")

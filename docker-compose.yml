@@ -11,5 +11,3 @@ services:
 
     volumes:
       - .:/app
-
-    network_mode: host

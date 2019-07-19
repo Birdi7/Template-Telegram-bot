@@ -7,7 +7,7 @@ def _(string, cache_enable=False):
     """
     why the cache enable parameters is needed:
     after starting the script, every var here will be
-    a LazyProxy object. When .value will be invoked, without cache_enable=True
+    a LazyProxy object. When .value will be invoked, without cache_enable=False
     it will be cache for the object after the first calling. As a result,
     the text for the locale with which the first calling was called will be for this object
 

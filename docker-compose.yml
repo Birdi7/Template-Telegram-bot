@@ -6,23 +6,8 @@ services:
       context: .
       dockerfile: dockerfile
 
-    environment:
-      # database settings
-      DB_NAME: ${DB_NAME}
-      HOST_URL: ${HOST_URL}
-
-      # telegram settings
-      BOT_TOKEN: ${BOT_TOKEN}
-
-      # webhook settings
-      WEBHOOK_HOST: ${WEBHOOK_HOST}
-      WEBHOOK_PORT: ${WEBHOOK_PORT}
-      WEBHOOK_LISTEN: ${WEBHOOK_LISTEN}
-      WEBHOOK_SSL_CERT_PATH: ${WEBHOOK_SSL_CERT_PATH}
-      WEBHOOK_SSL_PRIV_PATH: ${WEBHOOK_SSL_PRIV_PATH}
-
+    env_file:
+      - local.env
 
     volumes:
       - .:/app
-
-    network_mode: host

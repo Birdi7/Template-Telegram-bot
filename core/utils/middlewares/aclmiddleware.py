@@ -18,14 +18,14 @@ class ACLMiddleware(I18nMiddleware):
 
         tg_user = types.User.get_current()
         user = await get_user(tg_user.id)
+        super_locale = await super().get_user_locale(action, args)
 
         if user.locale is not None:  # if user set his locale
-            logging.info(f"returning user.locale={user.locale}")
             return user.locale
         else:
-            if tg_user.locale in LANGUAGES:  # take his clients locale if it exist
-                logging.info(f"returning tg_user.locale={tg_user.locale}")
+            if super_locale in LANGUAGES:
+                return super_locale
+            if tg_user.locale in LANGUAGES:
                 return tg_user.locale
             else:  # else, return default
-                logging.info(f"returning DEFAULT_USER_LOCALE={DEFAULT_USER_LOCALE}")
                 return DEFAULT_USER_LOCALE

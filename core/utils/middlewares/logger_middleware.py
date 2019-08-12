@@ -101,17 +101,9 @@ class LoggingMiddleware(BaseMiddleware):
 
     async def on_pre_process_callback_query(self, callback_query: types.CallbackQuery, data: dict):
         if callback_query.message:
-            if callback_query.message.from_user:
-                self.logger.info(f"Received callback query [ID:{callback_query.id}, DATA:{callback_query.data}] "
+            self.logger.info(f"Received callback query [DATA:{callback_query.data}] "
                                  f"in chat [{callback_query.message.chat.type}:{callback_query.message.chat.id}] "
-                                 f"from user [USERNAME:{callback_query.message.from_user.username}, ID:{callback_query.message.from_user.id}]")
-            else:
-                self.logger.info(f"Received callback query [ID:{callback_query.id}], DATA:{callback_query.data}] "
-                                 f"in chat [{callback_query.message.chat.type}:{callback_query.message.chat.id}]")
-        else:
-            self.logger.info(f"Received callback query [ID:{callback_query.id}, DATA:{callback_query.data}] "
-                             f"from inline message [ID:{callback_query.inline_message_id}] "
-                             f"from user [ID:{callback_query.from_user.username}]")
+                                 f"from user [USERNAME:{callback_query.from_user.username}]")
 
     async def on_post_process_callback_query(self, callback_query, results, data: dict):
         pass

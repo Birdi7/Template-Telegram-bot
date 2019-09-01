@@ -15,8 +15,6 @@ def on_startup(dp: Dispatcher):
     dp.middleware.setup(i18n)
 
 
-_ = i18n.lazy_gettext
-
 LANGUAGE_MAPPING = {
     'ru': 'Русский',
     'en': 'Английский'

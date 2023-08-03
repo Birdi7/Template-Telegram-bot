@@ -4,6 +4,6 @@ cchardet==2.1.4
 APScheduler==3.6.0
 umongo[motor]==2.1.0
 uvloop==0.12.2
-loguru==0.3.0
+loguru==0.5.3
 dnspython3==1.15.0
 python-rapidjson==0.7.2
